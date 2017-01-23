@@ -8,6 +8,7 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify'),
     minifyHTML = require('gulp-minify-html'),
     minifyJSON = require('gulp-jsonminify'),
+    imagemin = require('gulp-imagemin'),
     concat = require('gulp-concat');
 
 // add environment variables
@@ -92,6 +93,7 @@ gulp.task('watch', function() {
     gulp.watch('builds/development/*.html', ['html']);
     gulp.watch('builds/development/js/*.json', ['json']);
     gulp.watch(jsonSources, ['json']);
+    gulp.watch('builds/development/images/**/*.*', ['images']);
 });
 
 
@@ -117,6 +119,19 @@ gulp.task('html', function() {
         )
 });
 
+gulp.task('images', function() {
+    gulp.src('builds/development/images/**/*.*')
+        .pipe(
+            gulpif(env === 'production', imagemin())
+        )
+        .pipe(
+            gulpif(env === 'production', gulp.dest(outputDir + 'images'))
+        )
+        .pipe(
+            connect.reload()
+        )
+});
+
 gulp.task('json', function() {
     gulp.src('builds/development/js/*.json')
         .pipe(
@@ -131,4 +146,4 @@ gulp.task('json', function() {
 });
 
 // include all tasks in the default task
-gulp.task('default', ['coffee', 'js', 'compass', 'html', 'json', 'connect', 'watch']);
+gulp.task('default', ['coffee', 'js', 'compass', 'html', 'images', 'json', 'connect', 'watch']);
